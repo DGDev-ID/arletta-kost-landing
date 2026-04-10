@@ -43,6 +43,16 @@ defineProps<{
         <i :class="categoryMeta[room.category].icon" class="text-[10px]"></i>
         {{ categoryMeta[room.category].label }}
       </span>
+      <!-- Type Badge -->
+      <span
+        :class="[
+          'absolute bottom-3 left-3 flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+          room.type === 'putri' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700',
+        ]"
+      >
+        <i :class="room.type === 'putri' ? 'pi pi-venus' : 'pi pi-mars'" class="text-[10px]"></i>
+        {{ room.type === 'putri' ? 'Wanita' : 'Pria' }}
+      </span>
     </div>
 
     <!-- Content -->

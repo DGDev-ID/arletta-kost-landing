@@ -34,15 +34,64 @@ const emit = defineEmits<{
         <i :class="categoryMeta[room.category].icon" class="text-[10px]"></i>
         {{ categoryMeta[room.category].label }}
       </span>
+      <span
+        :class="[
+          'flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold',
+          room.type === 'putri' ? 'bg-pink-100 text-pink-700' : 'bg-sky-100 text-sky-700',
+        ]"
+      >
+        <i :class="room.type === 'putri' ? 'pi pi-venus' : 'pi pi-mars'" class="text-[10px]"></i>
+        {{ room.type === 'putri' ? 'Khusus Wanita' : 'Khusus Pria' }}
+      </span>
     </div>
 
     <h1 class="mb-2 text-3xl font-bold text-gray-900">{{ room.name }}</h1>
     <p class="mb-6 text-gray-500">Ukuran: {{ room.size }}</p>
 
-    <!-- Price -->
-    <div class="mb-6 rounded-xl bg-primary-50 p-4">
-      <p class="text-sm text-gray-500">Harga per bulan</p>
-      <p class="text-3xl font-bold text-primary-600">{{ formatPrice(room.price) }}</p>
+    <!-- Pricing Table -->
+    <div class="mb-6 overflow-hidden rounded-xl border border-gray-200">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="bg-primary-700 text-white">
+            <th class="px-4 py-3 text-left font-semibold">Durasi</th>
+            <th class="px-4 py-3 text-right font-semibold">Harga</th>
+            <th class="px-4 py-3 text-right font-semibold text-primary-200">Per Bulan</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr class="bg-accent-50">
+            <td class="px-4 py-3 font-medium text-gray-700">
+              <i class="pi pi-calendar mr-1.5 text-accent-500 text-xs"></i>1 Bulan
+            </td>
+            <td class="px-4 py-3 text-right font-bold text-primary-600">
+              {{ formatPrice(room.pricing.monthly) }}
+            </td>
+            <td class="px-4 py-3 text-right text-gray-400">—</td>
+          </tr>
+          <tr class="bg-white hover:bg-gray-50">
+            <td class="px-4 py-3 font-medium text-gray-700">
+              <i class="pi pi-calendar mr-1.5 text-primary-400 text-xs"></i>6 Bulan
+            </td>
+            <td class="px-4 py-3 text-right font-bold text-primary-600">
+              {{ formatPrice(room.pricing.sixMonths) }}
+            </td>
+            <td class="px-4 py-3 text-right text-xs text-gray-400">
+              {{ formatPrice(Math.round(room.pricing.sixMonths / 6)) }}/bln
+            </td>
+          </tr>
+          <tr class="bg-white hover:bg-gray-50">
+            <td class="px-4 py-3 font-medium text-gray-700">
+              <i class="pi pi-calendar mr-1.5 text-green-400 text-xs"></i>12 Bulan
+            </td>
+            <td class="px-4 py-3 text-right font-bold text-primary-600">
+              {{ formatPrice(room.pricing.twelveMonths) }}
+            </td>
+            <td class="px-4 py-3 text-right text-xs text-gray-400">
+              {{ formatPrice(Math.round(room.pricing.twelveMonths / 12)) }}/bln
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Description -->

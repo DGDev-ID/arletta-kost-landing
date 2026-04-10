@@ -133,9 +133,9 @@ onMounted(() => {
                   />
                   <div class="flex-1">
                     <h4 class="font-semibold text-gray-900">{{ room.name }}</h4>
-                    <p class="text-sm text-gray-500">{{ room.size }} · {{ room.type }}</p>
+                    <p class="text-sm text-gray-500">{{ room.size }}</p>
                     <p class="mt-1 text-lg font-bold text-primary-600">
-                      {{ formatPrice(room.price)
+                      {{ formatPrice(room.pricing.monthly)
                       }}<span class="text-sm font-normal text-gray-400">/bulan</span>
                     </p>
                   </div>
@@ -146,11 +146,11 @@ onMounted(() => {
               <div class="mb-6 space-y-2">
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">Sewa 1 bulan</span>
-                  <span class="text-gray-900">{{ formatPrice(room.price) }}</span>
+                  <span class="text-gray-900">{{ formatPrice(room.pricing.monthly) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">Deposit (1 bulan)</span>
-                  <span class="text-gray-900">{{ formatPrice(room.price) }}</span>
+                  <span class="text-gray-900">{{ formatPrice(room.pricing.monthly) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">Biaya admin</span>
@@ -160,7 +160,7 @@ onMounted(() => {
                   <div class="flex items-center justify-between">
                     <span class="font-semibold text-gray-900">Total</span>
                     <span class="text-xl font-bold text-primary-600">
-                      {{ formatPrice(room.price * 2 + 25000) }}
+                      {{ formatPrice(room.pricing.monthly * 2 + 25000) }}
                     </span>
                   </div>
                 </div>
@@ -222,7 +222,7 @@ onMounted(() => {
                 @click="processPayment"
                 class="w-full rounded-xl bg-primary-600 px-6 py-3.5 font-semibold text-white shadow-lg transition-all hover:bg-primary-700 hover:shadow-xl"
               >
-                Bayar {{ formatPrice(room.price * 2 + 25000) }}
+                Bayar {{ formatPrice(room.pricing.monthly * 2 + 25000) }}
               </button>
             </div>
 

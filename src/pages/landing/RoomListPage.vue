@@ -24,10 +24,9 @@ const filteredRooms = computed(() => {
 
 const categoryOptions: { value: FilterCategory; label: string; icon: string }[] = [
   { value: 'semua', label: 'Semua', icon: 'pi pi-list' },
-  { value: 'ekonomi', label: 'Ekonomi', icon: 'pi pi-wallet' },
   { value: 'standard', label: 'Standard', icon: 'pi pi-home' },
-  { value: 'deluxe', label: 'Deluxe', icon: 'pi pi-star' },
-  { value: 'premium', label: 'Premium', icon: 'pi pi-crown' },
+  { value: 'superior', label: 'Superior', icon: 'pi pi-star' },
+  { value: 'junior-suite', label: 'Junior Suite', icon: 'pi pi-crown' },
   { value: 'suite', label: 'Suite', icon: 'pi pi-building' },
 ]
 </script>
