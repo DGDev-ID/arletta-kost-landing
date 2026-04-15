@@ -195,7 +195,7 @@ onMounted(resetState)
                 <div>
                   <p class="text-sm font-semibold text-gray-900">{{ room.name }}</p>
                   <p class="text-xs font-bold text-primary-600">
-                    {{ formatPrice(room.pricing.monthly)
+                    {{ formatPrice(getRentalPrice())
                     }}<span class="font-normal text-gray-400">/bulan</span>
                   </p>
                 </div>
@@ -300,16 +300,17 @@ onMounted(resetState)
                       />
                       <div
                         :class="[
-                          'rounded-xl border-2 p-3 text-center transition-all',
+                          'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
                           selectedDuration === 'monthly'
                             ? 'border-primary-500 bg-primary-50'
                             : 'border-gray-200 bg-white hover:border-gray-300',
                         ]"
                       >
                         <p class="text-xs font-bold text-gray-900">1 Bulan</p>
-                        <p class="text-xs text-primary-600 font-semibold mt-0.5">
+                        <p class="text-xs text-primary-600 font-semibold mt-1">
                           {{ formatPrice(room.pricing.monthly) }}
                         </p>
+                        <p class="text-xs text-gray-400 mt-2">—</p>
                       </div>
                     </label>
                     <label
@@ -323,17 +324,17 @@ onMounted(resetState)
                       />
                       <div
                         :class="[
-                          'rounded-xl border-2 p-3 text-center transition-all',
+                          'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
                           selectedDuration === 'sixMonths'
                             ? 'border-primary-500 bg-primary-50'
                             : 'border-gray-200 bg-white hover:border-gray-300',
                         ]"
                       >
                         <p class="text-xs font-bold text-gray-900">6 Bulan</p>
-                        <p class="text-xs text-primary-600 font-semibold mt-0.5">
+                        <p class="text-xs text-primary-600 font-semibold mt-1">
                           {{ formatPrice(room.pricing.sixMonths) }}
                         </p>
-                        <p class="text-xs text-gray-400 mt-1">
+                        <p class="text-xs text-gray-400 mt-2">
                           {{ formatPrice(Math.round(room.pricing.sixMonths / 6)) }}/bln
                         </p>
                       </div>
@@ -349,17 +350,17 @@ onMounted(resetState)
                       />
                       <div
                         :class="[
-                          'rounded-xl border-2 p-3 text-center transition-all',
+                          'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
                           selectedDuration === 'twelveMonths'
                             ? 'border-primary-500 bg-primary-50'
                             : 'border-gray-200 bg-white hover:border-gray-300',
                         ]"
                       >
                         <p class="text-xs font-bold text-gray-900">12 Bulan</p>
-                        <p class="text-xs text-primary-600 font-semibold mt-0.5">
+                        <p class="text-xs text-primary-600 font-semibold mt-1">
                           {{ formatPrice(room.pricing.twelveMonths) }}
                         </p>
-                        <p class="text-xs text-gray-400 mt-1">
+                        <p class="text-xs text-gray-400 mt-2">
                           {{ formatPrice(Math.round(room.pricing.twelveMonths / 12)) }}/bln
                         </p>
                       </div>
