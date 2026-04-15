@@ -41,16 +41,6 @@ const currentYear = new Date().getFullYear()
                 Tentang Kami
               </RouterLink>
             </li>
-            <li>
-              <RouterLink to="/login" class="transition-colors hover:text-accent-400">
-                Login Penghuni
-              </RouterLink>
-            </li>
-            <li>
-              <RouterLink to="/signup" class="transition-colors hover:text-accent-400">
-                Daftar Akun
-              </RouterLink>
-            </li>
           </ul>
         </div>
 

@@ -1,60 +1,30 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRoute, useRouter, RouterLink } from 'vue-router'
+import { useRoute, RouterLink } from 'vue-router'
 import { getRoomBySlug } from '@/data/rooms'
-import { useAuthStore } from '@/stores/auth'
-import { useBookingStore } from '@/stores/booking'
-import { useToast } from 'primevue/usetoast'
 import RoomGallerySection from '@/components/rooms/RoomGallerySection.vue'
 import RoomInfoSection from '@/components/rooms/RoomInfoSection.vue'
-import RoomBookingModal from '@/components/rooms/RoomBookingModal.vue'
 import PaymentModal from '@/components/rooms/PaymentModal.vue'
 
 const route = useRoute()
-const router = useRouter()
-const authStore = useAuthStore()
-const bookingStore = useBookingStore()
-const toast = useToast()
 
 const slug = route.params.slug as string
 const room = computed(() => getRoomBySlug(slug))
 
 const activeImage = ref(0)
-const showBookingModal = ref(false)
 const showPaymentModal = ref(false)
 
 function handleBooking() {
-  if (!authStore.isAuthenticated) {
-    toast.add({
-      severity: 'warn',
-      summary: 'Login Diperlukan',
-      detail: 'Silakan login terlebih dahulu untuk memesan kamar.',
-      life: 3000,
-    })
-    router.push({ path: '/login', query: { redirect: route.fullPath } })
-    return
-  }
-
   if (!room.value) return
-
-  // Show payment modal instead of directly booking
   showPaymentModal.value = true
 }
 
 function handlePaymentSuccess() {
-  if (!room.value) return
-
-  bookingStore.addBooking(room.value.name, room.value.slug)
   showPaymentModal.value = false
-  showBookingModal.value = true
 }
 
 function closePaymentModal() {
   showPaymentModal.value = false
-}
-
-function closeModal() {
-  showBookingModal.value = false
 }
 </script>
 
@@ -95,8 +65,6 @@ function closeModal() {
         </div>
       </template>
     </div>
-
-    <RoomBookingModal :show="showBookingModal" :room-name="room?.name ?? ''" @close="closeModal" />
 
     <PaymentModal
       v-if="room"

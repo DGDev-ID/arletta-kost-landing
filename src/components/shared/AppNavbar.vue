@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { RouterLink, useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
+import { RouterLink } from 'vue-router'
 
-const authStore = useAuthStore()
-const router = useRouter()
 const isMobileMenuOpen = ref(false)
 
 function toggleMenu() {
@@ -13,12 +10,6 @@ function toggleMenu() {
 
 function closeMenu() {
   isMobileMenuOpen.value = false
-}
-
-function handleLogout() {
-  authStore.logout()
-  closeMenu()
-  router.push('/')
 }
 </script>
 
@@ -63,38 +54,6 @@ function handleLogout() {
           >
             Tentang Kami
           </RouterLink>
-
-          <template v-if="authStore.isAuthenticated">
-            <RouterLink
-              to="/dashboard"
-              class="font-medium text-white/80 transition-colors hover:text-white"
-              active-class="!text-white"
-            >
-              Dashboard
-            </RouterLink>
-            <button
-              @click="handleLogout"
-              class="rounded-lg border border-white/30 px-5 py-2 font-medium text-white transition-all hover:border-white hover:bg-white/10"
-            >
-              Logout
-            </button>
-          </template>
-          <template v-else>
-            <div class="flex items-center gap-2">
-              <RouterLink
-                to="/login"
-                class="rounded-lg bg-accent-400 px-5 py-2 font-semibold text-primary-900 transition-all hover:bg-accent-300 hover:shadow-md"
-              >
-                Login
-              </RouterLink>
-              <RouterLink
-                to="/signup"
-                class="rounded-lg border border-white/30 px-5 py-2 font-medium text-white transition-all hover:border-white hover:bg-white/10"
-              >
-                Sign Up
-              </RouterLink>
-            </div>
-          </template>
         </div>
 
         <!-- Mobile Hamburger -->
@@ -160,40 +119,6 @@ function handleLogout() {
             >
               Tentang Kami
             </RouterLink>
-
-            <template v-if="authStore.isAuthenticated">
-              <RouterLink
-                to="/dashboard"
-                class="rounded-lg px-4 py-2.5 font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
-                @click="closeMenu"
-              >
-                Dashboard
-              </RouterLink>
-              <button
-                @click="handleLogout"
-                class="mx-4 mt-2 rounded-lg border border-white/30 px-5 py-2.5 font-medium text-white transition-all hover:border-white hover:bg-white/10"
-              >
-                Logout
-              </button>
-            </template>
-            <template v-else>
-              <div class="mx-4 mt-2 flex gap-2">
-                <RouterLink
-                  to="/login"
-                  class="flex-1 rounded-lg bg-accent-400 px-5 py-2.5 text-center font-semibold text-primary-900 transition-all hover:bg-accent-300"
-                  @click="closeMenu"
-                >
-                  Login
-                </RouterLink>
-                <RouterLink
-                  to="/signup"
-                  class="flex-1 rounded-lg border border-white/30 px-5 py-2.5 text-center font-medium text-white transition-all hover:border-white hover:bg-white/10"
-                  @click="closeMenu"
-                >
-                  Sign Up
-                </RouterLink>
-              </div>
-            </template>
           </div>
         </div>
       </Transition>
