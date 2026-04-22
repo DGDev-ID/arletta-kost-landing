@@ -1,17 +1,13 @@
 <script setup lang="ts">
-import type { RoomCategory } from '@/data/rooms'
-
-type FilterCategory = 'semua' | RoomCategory
-
 defineProps<{
   searchQuery: string
-  selectedCategory: FilterCategory
-  categoryOptions: { value: FilterCategory; label: string; icon: string }[]
+  selectedCategory: string
+  categoryOptions: { value: string; label: string; icon: string }[]
 }>()
 
 const emit = defineEmits<{
   'update:searchQuery': [value: string]
-  'update:selectedCategory': [value: FilterCategory]
+  'update:selectedCategory': [value: string]
 }>()
 
 function onSearchInput(event: Event) {

@@ -1,11 +1,11 @@
-﻿<script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+<script setup lang="ts">
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
-import { formatPrice, type Room } from '@/data/rooms'
+import { formatPrice, type ApiRoom, type ApiPricing } from '@/services/api'
 
 const props = defineProps<{
   show: boolean
-  room: Room
+  room: ApiRoom
 }>()
 
 const emit = defineEmits<{
@@ -16,10 +16,27 @@ const emit = defineEmits<{
 const toast = useToast()
 const paymentStep = ref<'guest-form' | 'summary' | 'processing' | 'success' | 'error'>('guest-form')
 const selectedPayment = ref('bca_va')
-const selectedDuration = ref<'monthly' | 'sixMonths' | 'twelveMonths'>('monthly')
+const selectedPricingId = ref<number | null>(null)
 
 const guestForm = reactive({ name: '', email: '', phone: '' })
 const formErrors = reactive({ name: '', email: '', phone: '' })
+
+// Sorted pricings by duration
+const sortedPricings = computed(() =>
+  [...(props.room.pricings ?? [])].sort((a, b) => a.duration_days - b.duration_days)
+)
+
+// Auto-select first pricing
+onMounted(() => {
+  resetState()
+})
+
+const selectedPricing = computed<ApiPricing | null>(() => {
+  if (!selectedPricingId.value && sortedPricings.value.length > 0) {
+    return sortedPricings.value[0]
+  }
+  return sortedPricings.value.find((p) => p.id === selectedPricingId.value) ?? null
+})
 
 const paymentMethods = [
   { id: 'bca_va', name: 'BCA Virtual Account', icon: 'pi pi-building', category: 'Bank Transfer' },
@@ -58,20 +75,29 @@ function validateGuestForm(): boolean {
 }
 
 function getDurationLabel(): string {
-  if (selectedDuration.value === 'monthly') return '1 Bulan'
-  if (selectedDuration.value === 'sixMonths') return '6 Bulan'
-  return '12 Bulan'
+  if (!selectedPricing.value) return ''
+  return selectedPricing.value.price_display.split('Rp')[0] || `${selectedPricing.value.duration_days} hari`
 }
 
 function getRentalPrice(): number {
-  if (selectedDuration.value === 'monthly') return props.room.pricing.monthly
-  if (selectedDuration.value === 'sixMonths') return props.room.pricing.sixMonths
-  return props.room.pricing.twelveMonths
+  return selectedPricing.value?.price ?? 0
+}
+
+function getDeposit(): number {
+  // Deposit = cheapest pricing (monthly)
+  return sortedPricings.value.length > 0 ? sortedPricings.value[0].price : 0
 }
 
 function getTotalPrice(): number {
-  const rentalPrice = getRentalPrice()
-  return rentalPrice + props.room.pricing.monthly + 25000
+  return getRentalPrice() + getDeposit() + 25000
+}
+
+function roomDisplayName(): string {
+  return `${props.room.category.name} — ${props.room.room_number}`
+}
+
+function roomImageUrl(): string | null {
+  return props.room.images?.[0]?.url ?? null
 }
 
 function submitGuestForm() {
@@ -86,7 +112,7 @@ function processPayment() {
       toast.add({
         severity: 'success',
         summary: 'Pembayaran Berhasil',
-        detail: `Pemesanan ${props.room.name} atas nama ${guestForm.name} dikonfirmasi.`,
+        detail: `Pemesanan ${roomDisplayName()} atas nama ${guestForm.name} dikonfirmasi.`,
         life: 4000,
       })
     } else {
@@ -114,7 +140,7 @@ function retryPayment() {
 function resetState() {
   paymentStep.value = 'guest-form'
   selectedPayment.value = 'bca_va'
-  selectedDuration.value = 'monthly'
+  selectedPricingId.value = sortedPricings.value.length > 0 ? sortedPricings.value[0].id : null
   guestForm.name = ''
   guestForm.email = ''
   guestForm.phone = ''
@@ -122,8 +148,6 @@ function resetState() {
   formErrors.email = ''
   formErrors.phone = ''
 }
-
-onMounted(resetState)
 </script>
 
 <template>
@@ -191,9 +215,12 @@ onMounted(resetState)
               <div
                 class="mb-5 flex items-center gap-3 rounded-xl border border-gray-100 bg-gray-50 p-3"
               >
-                <img :src="room.image" :alt="room.name" class="h-12 w-12 rounded-lg object-cover" />
+                <img v-if="roomImageUrl()" :src="roomImageUrl()!" :alt="roomDisplayName()" class="h-12 w-12 rounded-lg object-cover" />
+                <div v-else class="flex h-12 w-12 items-center justify-center rounded-lg bg-gray-200">
+                  <i class="pi pi-image text-gray-400"></i>
+                </div>
                 <div>
-                  <p class="text-sm font-semibold text-gray-900">{{ room.name }}</p>
+                  <p class="text-sm font-semibold text-gray-900">{{ roomDisplayName() }}</p>
                   <p class="text-xs font-bold text-primary-600">
                     {{ formatPrice(getRentalPrice())
                     }}<span class="font-normal text-gray-400">/bulan</span>
@@ -283,85 +310,36 @@ onMounted(resetState)
                   </p>
                 </div>
 
-                <!-- Duration Selection -->
-                <div>
+                <!-- Duration Selection — dynamic from API pricings -->
+                <div v-if="sortedPricings.length > 0">
                   <label class="mb-2.5 block text-sm font-medium text-gray-700">
                     Durasi Sewa <span class="text-red-500">*</span>
                   </label>
-                  <div class="grid gap-2 grid-cols-3">
+                  <div class="grid gap-2" :class="sortedPricings.length <= 3 ? `grid-cols-${sortedPricings.length}` : 'grid-cols-2 sm:grid-cols-3'">
                     <label
+                      v-for="pricing in sortedPricings"
+                      :key="pricing.id"
                       class="relative cursor-pointer"
                     >
                       <input
-                        v-model="selectedDuration"
+                        v-model="selectedPricingId"
                         type="radio"
-                        value="monthly"
+                        :value="pricing.id"
                         class="sr-only"
                       />
                       <div
                         :class="[
                           'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
-                          selectedDuration === 'monthly'
+                          selectedPricingId === pricing.id
                             ? 'border-primary-500 bg-primary-50'
                             : 'border-gray-200 bg-white hover:border-gray-300',
                         ]"
                       >
-                        <p class="text-xs font-bold text-gray-900">1 Bulan</p>
+                        <p class="text-xs font-bold text-gray-900">
+                          {{ pricing.price_display.split(' / ')[1] || pricing.duration_days + ' hari' }}
+                        </p>
                         <p class="text-xs text-primary-600 font-semibold mt-1">
-                          {{ formatPrice(room.pricing.monthly) }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-2">—</p>
-                      </div>
-                    </label>
-                    <label
-                      class="relative cursor-pointer"
-                    >
-                      <input
-                        v-model="selectedDuration"
-                        type="radio"
-                        value="sixMonths"
-                        class="sr-only"
-                      />
-                      <div
-                        :class="[
-                          'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
-                          selectedDuration === 'sixMonths'
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-200 bg-white hover:border-gray-300',
-                        ]"
-                      >
-                        <p class="text-xs font-bold text-gray-900">6 Bulan</p>
-                        <p class="text-xs text-primary-600 font-semibold mt-1">
-                          {{ formatPrice(room.pricing.sixMonths) }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-2">
-                          {{ formatPrice(Math.round(room.pricing.sixMonths / 6)) }}/bln
-                        </p>
-                      </div>
-                    </label>
-                    <label
-                      class="relative cursor-pointer"
-                    >
-                      <input
-                        v-model="selectedDuration"
-                        type="radio"
-                        value="twelveMonths"
-                        class="sr-only"
-                      />
-                      <div
-                        :class="[
-                          'rounded-xl border-2 p-3 text-center transition-all min-h-24 flex flex-col justify-center',
-                          selectedDuration === 'twelveMonths'
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-200 bg-white hover:border-gray-300',
-                        ]"
-                      >
-                        <p class="text-xs font-bold text-gray-900">12 Bulan</p>
-                        <p class="text-xs text-primary-600 font-semibold mt-1">
-                          {{ formatPrice(room.pricing.twelveMonths) }}
-                        </p>
-                        <p class="text-xs text-gray-400 mt-2">
-                          {{ formatPrice(Math.round(room.pricing.twelveMonths / 12)) }}/bln
+                          {{ formatPrice(pricing.price) }}
                         </p>
                       </div>
                     </label>
@@ -384,15 +362,19 @@ onMounted(resetState)
               <div class="mb-4 rounded-xl border border-gray-100 bg-gray-50 p-4">
                 <div class="flex items-start gap-4">
                   <img
-                    :src="room.image"
-                    :alt="room.name"
+                    v-if="roomImageUrl()"
+                    :src="roomImageUrl()!"
+                    :alt="roomDisplayName()"
                     class="h-16 w-16 rounded-lg object-cover"
                   />
+                  <div v-else class="flex h-16 w-16 items-center justify-center rounded-lg bg-gray-200">
+                    <i class="pi pi-image text-xl text-gray-400"></i>
+                  </div>
                   <div class="flex-1">
-                    <h4 class="font-semibold text-gray-900">{{ room.name }}</h4>
-                    <p class="text-sm text-gray-500">{{ room.size }}</p>
+                    <h4 class="font-semibold text-gray-900">{{ roomDisplayName() }}</h4>
+                    <p class="text-sm text-gray-500">{{ room.kost.name }}</p>
                     <p class="mt-1 text-lg font-bold text-primary-600">
-                      {{ formatPrice(room.pricing.monthly)
+                      {{ formatPrice(room.minimum_price)
                       }}<span class="text-sm font-normal text-gray-400">/bulan</span>
                     </p>
                   </div>
@@ -408,7 +390,7 @@ onMounted(resetState)
                   <span><i class="pi pi-user mr-1.5 text-xs"></i>{{ guestForm.name }}</span>
                   <span><i class="pi pi-envelope mr-1.5 text-xs"></i>{{ guestForm.email }}</span>
                   <span><i class="pi pi-phone mr-1.5 text-xs"></i>{{ guestForm.phone }}</span>
-                  <span><i class="pi pi-calendar mr-1.5 text-xs"></i>Durasi: {{ getDurationLabel() }}</span>
+                  <span v-if="selectedPricing"><i class="pi pi-calendar mr-1.5 text-xs"></i>Durasi: {{ selectedPricing.price_display.split(' / ')[1] || selectedPricing.duration_days + ' hari' }}</span>
                 </div>
                 <button
                   @click="paymentStep = 'guest-form'"
@@ -421,12 +403,12 @@ onMounted(resetState)
               <!-- Price Breakdown -->
               <div class="mb-5 space-y-2">
                 <div class="flex items-center justify-between text-sm">
-                  <span class="text-gray-500">Sewa {{ getDurationLabel() }}</span>
+                  <span class="text-gray-500">Sewa {{ selectedPricing ? (selectedPricing.price_display.split(' / ')[1] || selectedPricing.duration_days + ' hari') : '' }}</span>
                   <span class="text-gray-900">{{ formatPrice(getRentalPrice()) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                  <span class="text-gray-500">Deposit (1 bulan)</span>
-                  <span class="text-gray-900">{{ formatPrice(room.pricing.monthly) }}</span>
+                  <span class="text-gray-500">Deposit</span>
+                  <span class="text-gray-900">{{ formatPrice(getDeposit()) }}</span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
                   <span class="text-gray-500">Biaya admin</span>
@@ -530,7 +512,7 @@ onMounted(resetState)
               </div>
               <h3 class="mb-2 text-2xl font-bold text-gray-900">Pembayaran Berhasil!</h3>
               <p class="mb-1 text-center text-gray-500">
-                Kamar <strong>{{ room.name }}</strong> telah berhasil dipesan.
+                Kamar <strong>{{ roomDisplayName() }}</strong> telah berhasil dipesan.
               </p>
               <p class="mb-1 text-center text-sm text-gray-500">
                 Atas nama: <strong>{{ guestForm.name }}</strong>

@@ -22,13 +22,14 @@ function closeMenu() {
         <!-- Logo -->
         <RouterLink to="/" class="flex items-center gap-2" @click="closeMenu">
           <div
-            class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-400 text-lg font-bold text-primary-900"
+            class="flex h-9 w-9 items-center justify-center rounded-lg text-lg font-bold text-primary-900 w-33 h-33"
           >
-            A
+            <img
+      src="/public/logo.png" 
+      alt="Logo"
+      class="h-full w-full object-contain"
+    />
           </div>
-          <span class="text-xl font-bold text-white"
-            >Arletta<span class="text-accent-400">Kost</span></span
-          >
         </RouterLink>
 
         <!-- Desktop Menu -->

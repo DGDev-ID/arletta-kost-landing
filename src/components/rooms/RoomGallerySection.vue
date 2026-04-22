@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, watch } from 'vue'
-import type { Room } from '@/data/rooms'
+import { onMounted, onBeforeUnmount, watch, computed } from 'vue'
+import type { ApiRoom } from '@/services/api'
 
 const props = defineProps<{
-  room: Room
+  room: ApiRoom
   activeImage: number
 }>()
 
@@ -11,15 +11,20 @@ const emit = defineEmits<{
   'update:activeImage': [value: number]
 }>()
 
+// Map ApiRoom images to string URLs
+const imageUrls = computed(() => props.room.images?.map((img) => img.url) ?? [])
+
 let autoSlideTimer: ReturnType<typeof setInterval> | null = null
 
 function prev() {
-  const newIdx = props.activeImage === 0 ? props.room.images.length - 1 : props.activeImage - 1
+  if (imageUrls.value.length === 0) return
+  const newIdx = props.activeImage === 0 ? imageUrls.value.length - 1 : props.activeImage - 1
   emit('update:activeImage', newIdx)
 }
 
 function next() {
-  const newIdx = props.activeImage === props.room.images.length - 1 ? 0 : props.activeImage + 1
+  if (imageUrls.value.length === 0) return
+  const newIdx = props.activeImage === imageUrls.value.length - 1 ? 0 : props.activeImage + 1
   emit('update:activeImage', newIdx)
 }
 
@@ -29,7 +34,7 @@ function goTo(idx: number) {
 
 function startAutoSlide() {
   stopAutoSlide()
-  if (props.room.images.length < 2) return
+  if (imageUrls.value.length < 2) return
   autoSlideTimer = setInterval(() => {
     next()
   }, 4000)
@@ -61,8 +66,17 @@ onBeforeUnmount(() => {
 
 <template>
   <div>
+    <!-- No images -->
+    <div
+      v-if="imageUrls.length === 0"
+      class="mb-4 flex h-80 items-center justify-center overflow-hidden rounded-2xl bg-gray-100 sm:h-96"
+    >
+      <i class="pi pi-image text-6xl text-gray-300"></i>
+    </div>
+
     <!-- Main image with prev/next buttons -->
     <div
+      v-else
       class="group relative mb-4 overflow-hidden rounded-2xl"
       @mouseenter="stopAutoSlide"
       @mouseleave="startAutoSlide"
@@ -79,15 +93,15 @@ onBeforeUnmount(() => {
       >
         <img
           :key="activeImage"
-          :src="room.images[activeImage]"
-          :alt="`${room.name} foto ${activeImage + 1}`"
+          :src="imageUrls[activeImage]"
+          :alt="`${room.category.name} — ${room.room_number} foto ${activeImage + 1}`"
           class="h-80 w-full object-cover sm:h-96"
         />
       </Transition>
 
       <!-- Prev button -->
       <button
-        v-if="room.images.length > 1"
+        v-if="imageUrls.length > 1"
         @click="prev"
         class="absolute top-1/2 left-3 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/60 group-hover:opacity-100"
         aria-label="Foto sebelumnya"
@@ -97,7 +111,7 @@ onBeforeUnmount(() => {
 
       <!-- Next button -->
       <button
-        v-if="room.images.length > 1"
+        v-if="imageUrls.length > 1"
         @click="next"
         class="absolute top-1/2 right-3 -translate-y-1/2 flex h-10 w-10 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-all hover:bg-black/60 group-hover:opacity-100"
         aria-label="Foto berikutnya"
@@ -107,11 +121,11 @@ onBeforeUnmount(() => {
 
       <!-- Dot indicators -->
       <div
-        v-if="room.images.length > 1"
+        v-if="imageUrls.length > 1"
         class="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"
       >
         <button
-          v-for="(_, idx) in room.images"
+          v-for="(_, idx) in imageUrls"
           :key="idx"
           @click="goTo(idx)"
           :class="[
@@ -124,17 +138,17 @@ onBeforeUnmount(() => {
 
       <!-- Image counter -->
       <div
-        v-if="room.images.length > 1"
+        v-if="imageUrls.length > 1"
         class="absolute top-3 right-3 rounded-full bg-black/40 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm"
       >
-        {{ activeImage + 1 }} / {{ room.images.length }}
+        {{ activeImage + 1 }} / {{ imageUrls.length }}
       </div>
     </div>
 
     <!-- Thumbnails -->
-    <div v-if="room.images.length > 1" class="flex gap-3 overflow-x-auto pb-1">
+    <div v-if="imageUrls.length > 1" class="flex gap-3 overflow-x-auto pb-1">
       <button
-        v-for="(img, idx) in room.images"
+        v-for="(img, idx) in imageUrls"
         :key="idx"
         @click="goTo(idx)"
         :class="[
@@ -144,7 +158,7 @@ onBeforeUnmount(() => {
             : 'border-transparent opacity-60 hover:opacity-100',
         ]"
       >
-        <img :src="img" :alt="`${room.name} foto ${idx + 1}`" class="h-full w-full object-cover" />
+        <img :src="img" :alt="`${room.category.name} foto ${idx + 1}`" class="h-full w-full object-cover" />
       </button>
     </div>
   </div>

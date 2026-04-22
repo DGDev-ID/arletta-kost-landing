@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import RoomCard from '@/components/rooms/RoomCard.vue'
-import type { Room } from '@/data/rooms'
+import type { ApiRoom } from '@/services/api'
 
 defineProps<{
-  rooms: Room[]
+  rooms: ApiRoom[]
 }>()
 </script>
 

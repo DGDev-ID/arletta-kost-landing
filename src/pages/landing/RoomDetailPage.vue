@@ -1,18 +1,30 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-import { getRoomBySlug } from '@/data/rooms'
+import { fetchRoom, type ApiRoom } from '@/services/api'
 import RoomGallerySection from '@/components/rooms/RoomGallerySection.vue'
 import RoomInfoSection from '@/components/rooms/RoomInfoSection.vue'
 import PaymentModal from '@/components/rooms/PaymentModal.vue'
 
 const route = useRoute()
 
-const slug = route.params.slug as string
-const room = computed(() => getRoomBySlug(slug))
+const roomId = Number(route.params.slug) // now uses id instead of slug
+const room = ref<ApiRoom | null>(null)
+const loading = ref(true)
+const error = ref(false)
 
 const activeImage = ref(0)
 const showPaymentModal = ref(false)
+
+onMounted(async () => {
+  try {
+    room.value = await fetchRoom(roomId)
+  } catch {
+    error.value = true
+  } finally {
+    loading.value = false
+  }
+})
 
 function handleBooking() {
   if (!room.value) return
@@ -40,8 +52,19 @@ function closePaymentModal() {
         Kembali ke Daftar Kamar
       </RouterLink>
 
+      <!-- Loading -->
+      <div v-if="loading" class="grid gap-8 lg:grid-cols-2">
+        <div class="h-96 animate-pulse rounded-2xl bg-gray-200"></div>
+        <div class="space-y-4">
+          <div class="h-8 w-3/4 animate-pulse rounded bg-gray-200"></div>
+          <div class="h-6 w-1/2 animate-pulse rounded bg-gray-200"></div>
+          <div class="h-40 animate-pulse rounded-xl bg-gray-200"></div>
+          <div class="h-20 animate-pulse rounded-xl bg-gray-200"></div>
+        </div>
+      </div>
+
       <!-- Not Found -->
-      <div v-if="!room" class="py-20 text-center">
+      <div v-else-if="error || !room" class="py-20 text-center">
         <div
           class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100"
         >
