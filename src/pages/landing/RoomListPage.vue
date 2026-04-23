@@ -52,7 +52,6 @@ watch(searchQuery, () => {
 })
 
 // Filtered rooms (client-side category filter on already-fetched data)
-import { computed } from 'vue'
 const filteredRooms = computed(() => {
   if (selectedCategory.value === 'semua') return rooms.value
   return rooms.value.filter((r) => r.category.name === selectedCategory.value)

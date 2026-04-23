@@ -16,7 +16,7 @@ defineProps<{
     <div class="relative h-48 overflow-hidden">
       <img
         v-if="room.images && room.images.length > 0"
-        :src="room.images[0].url"
+        :src="room.images[0]?.url"
         :alt="room.category.name + ' — ' + room.room_number"
         class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
         loading="lazy"

@@ -33,7 +33,7 @@ onMounted(() => {
 
 const selectedPricing = computed<ApiPricing | null>(() => {
   if (!selectedPricingId.value && sortedPricings.value.length > 0) {
-    return sortedPricings.value[0]
+    return sortedPricings.value[0] ?? null
   }
   return sortedPricings.value.find((p) => p.id === selectedPricingId.value) ?? null
 })
@@ -85,7 +85,7 @@ function getRentalPrice(): number {
 
 function getDeposit(): number {
   // Deposit = cheapest pricing (monthly)
-  return sortedPricings.value.length > 0 ? sortedPricings.value[0].price : 0
+  return sortedPricings.value[0]?.price ?? 0
 }
 
 function getTotalPrice(): number {
@@ -140,7 +140,7 @@ function retryPayment() {
 function resetState() {
   paymentStep.value = 'guest-form'
   selectedPayment.value = 'bca_va'
-  selectedPricingId.value = sortedPricings.value.length > 0 ? sortedPricings.value[0].id : null
+  selectedPricingId.value = sortedPricings.value[0]?.id ?? null
   guestForm.name = ''
   guestForm.email = ''
   guestForm.phone = ''
