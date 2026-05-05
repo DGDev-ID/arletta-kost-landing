@@ -232,18 +232,28 @@ onBeforeUnmount(() => {
             ArlettaKost menyediakan kamar kos berkualitas dengan fasilitas lengkap, keamanan 24 jam,
             dan lokasi strategis. Tempat tinggal ideal untuk mahasiswa dan profesional muda.
           </p>
-          <div class="flex flex-col items-center gap-4 sm:flex-row lg:justify-start">
-            <RouterLink
-              to="/rooms"
-              class="w-full rounded-xl bg-accent-400 px-8 py-3.5 text-center font-semibold text-primary-900 shadow-lg transition-all hover:bg-accent-300 hover:shadow-xl sm:w-auto"
-            >
-              <i class="pi pi-search mr-1"></i> Lihat Kamar
-            </RouterLink>
+          <div class="flex flex-col gap-3 lg:justify-start">
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <RouterLink
+                to="/rooms"
+                class="rounded-xl bg-accent-400 px-8 py-3.5 text-center font-semibold text-primary-900 shadow-lg transition-all hover:bg-accent-300 hover:shadow-xl w-fit"
+              >
+                <i class="pi pi-search mr-1"></i> Lihat Kamar
+              </RouterLink>
+              <a
+                href="#features"
+                class="rounded-xl border-2 border-white/20 px-8 py-3.5 text-center font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5 w-fit"
+              >
+                Pelajari Lebih Lanjut
+              </a>
+            </div>
             <a
-              href="#features"
-              class="w-full rounded-xl border-2 border-white/20 px-8 py-3.5 text-center font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5 sm:w-auto"
+              href="https://arlettaluxury.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="rounded-xl border-2 border-white/20 px-23 py-3.5 text-center font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5 w-fit"
             >
-              Pelajari Lebih Lanjut
+              <i class="pi pi-arrow-up-right mr-1"></i> Kembali ke Website Utama
             </a>
           </div>
         </div>
