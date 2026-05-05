@@ -10,12 +10,16 @@ const currentYear = new Date().getFullYear()
         <div>
           <div class="mb-4 flex items-center gap-2">
             <div
-              class="flex h-9 w-9 items-center justify-center rounded-lg bg-accent-400 text-lg font-bold text-primary-900"
+              class="flex h-9 w-9 items-center justify-center rounded-lg"
             >
-              A
+              <img
+                src="/public/logo-kos.svg"
+                alt="Logo"
+                class="h-full w-full object-contain"
+              />
             </div>
             <span class="text-xl font-bold text-white"
-              >Arletta<span class="text-accent-400">Kost</span></span
+              >Arletta<span class="text-primary-400">Cozy</span></span
             >
           </div>
           <p class="leading-relaxed text-gray-400">
@@ -50,15 +54,15 @@ const currentYear = new Date().getFullYear()
           <ul class="space-y-2 text-gray-400">
             <li class="flex items-center gap-2">
               <i class="pi pi-map-marker text-sm text-accent-400"></i>
-              <span>Jl. Contoh No. 123, Jakarta Selatan</span>
+              <span>Gang Kelapa Gading, RT.02/RW.01, Wates, Kec. Ngaliyan, Kota Semarang, Jawa Tengah 50188</span>
             </li>
             <li class="flex items-center gap-2">
               <i class="pi pi-phone text-sm text-accent-400"></i>
-              <span>+62 812-3456-7890</span>
+              <span>+62 851-3800-8559</span>
             </li>
             <li class="flex items-center gap-2">
               <i class="pi pi-envelope text-sm text-accent-400"></i>
-              <span>info@arlettakost.com</span>
+              <span>cs@arletta.com</span>
             </li>
           </ul>
         </div>
