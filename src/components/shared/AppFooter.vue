@@ -22,10 +22,19 @@ const currentYear = new Date().getFullYear()
               >Arletta<span class="text-primary-400">Cozy</span></span
             >
           </div>
-          <p class="leading-relaxed text-gray-400">
+          <p class="mb-4 leading-relaxed text-gray-400">
             Tempat kos nyaman, aman, dan strategis untuk mahasiswa dan profesional muda. Fasilitas
             lengkap dengan harga terjangkau.
           </p>
+          <a
+            href="https://instagram.com/arletta.cozy"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-accent-400 transition-all hover:bg-accent-400 hover:text-white"
+            title="Follow kami di Instagram"
+          >
+            <i class="pi pi-instagram text-lg"></i>
+          </a>
         </div>
 
         <!-- Quick Links -->
